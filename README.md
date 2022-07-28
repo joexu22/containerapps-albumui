@@ -1,8 +1,28 @@
 # Azure Container Apps Album Viewer UI
 
-This is the companion repository for the [Azure Container Apps code-to-cloud quickstart]() Album Viewer UI.
+## Container App Creation Code
 
-The Album API sample is available in other languages:
+$RESOURCE_GROUP="containerapps-demo"
+$LOCATION="eastus"
+$ENVIRONMENT="containerapps-env-demo"
+$API_NAME="album-api"
+$FRONTEND_NAME="album-ui"
+$ACR_NAME="academo"
+$API_BASE_URL=$(az containerapp show --resource-group $RESOURCE_GROUP --name $API_NAME --query properties.configuration.ingress.fqdn -o tsv)
 
-| [C#](https://github.com/azure-samples/containerapps-albumapi-csharp) | [Go](https://github.com/azure-samples/containerapps-albumapi-go) | [Python](https://github.com/azure-samples/containerapps-albumapi-python) | [JavaScript](https://github.com/azure-samples/containerapps-albumapi-javascript) |
-| -------------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+az containerapp create `
+    --name $FRONTEND_NAME `
+    --resource-group $RESOURCE_GROUP `
+    --environment $ENVIRONMENT `
+    --image $ACR_NAME.azurecr.io/albumapp-ui  `
+    --env-vars API_BASE_URL=https://$API_BASE_URL `
+    --target-port 3000 `
+    --ingress 'external' `
+    --registry-server "$ACR_NAME.azurecr.io"  `
+    --query configuration.ingress.fqdn
+
+## Build Code
+
+cd into src folder
+
+az acr build --registry $ACR_NAME --image albumapp-ui .
