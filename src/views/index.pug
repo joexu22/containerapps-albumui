@@ -6,6 +6,7 @@ block content
         each album in albums
           div(class="item")
             div(class="ui image small")
+			  a(href=album.link)
               img(src=album.image_url)
             div(class="content")
               div(class="header")
